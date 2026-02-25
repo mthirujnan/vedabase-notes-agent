@@ -94,10 +94,9 @@ The wrapper tries three strategies:
 ### 1. Install Python dependencies
 
 ```bash
-cd "/Users/muthukumar/Desktop/Claude Projects/vedabase-notes-agent"
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Create a clean conda environment (run once)
+conda create -n vedabase-agent python=3.11 -y
+conda run -n vedabase-agent pip install -r requirements.txt
 ```
 
 ### 2. Configure your environment
