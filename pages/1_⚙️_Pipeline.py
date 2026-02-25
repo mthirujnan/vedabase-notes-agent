@@ -56,9 +56,9 @@ def step_card(num, title, description, status_ok, ok_detail, fail_detail):
             st.markdown(f"#### {icon} Step {num}: {title}")
             st.caption(description)
             if status_ok:
-                st.success(ok_detail, icon="✓")
+                st.success(ok_detail, icon="✅")
             else:
-                st.info(fail_detail, icon="ℹ️")
+                st.info(fail_detail, icon="💡")
         with col_btn:
             st.write("")  # vertical spacing
             return st.button(
