@@ -44,7 +44,7 @@ def show_jobs_sidebar():
             result_path = job.get("result_path", "")
             col1, col2 = st.sidebar.columns([3, 1])
             col1.markdown(f"✅ **Done**\n\n*{short_topic}*")
-            if col2.button("✕", key=f"clear_{job_id}", help="Dismiss"):
+            if col2.button("✕", key=f"sb_clear_{job_id}", help="Dismiss"):
                 clear_job(job_id)
                 st.rerun()
             if result_path:
@@ -56,7 +56,7 @@ def show_jobs_sidebar():
                         data=content,
                         file_name=Path(result_path).name,
                         mime="text/markdown",
-                        key=f"dl_{job_id}",
+                        key=f"sb_dl_{job_id}",
                         use_container_width=True,
                     )
                 except Exception:
@@ -65,7 +65,7 @@ def show_jobs_sidebar():
         elif status == "error":
             col1, col2 = st.sidebar.columns([3, 1])
             col1.markdown(f"❌ **Failed**\n\n*{short_topic}*")
-            if col2.button("✕", key=f"clear_err_{job_id}", help="Dismiss"):
+            if col2.button("✕", key=f"sb_clear_err_{job_id}", help="Dismiss"):
                 clear_job(job_id)
                 st.rerun()
             with st.sidebar.expander("See error"):
