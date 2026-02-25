@@ -14,6 +14,8 @@ ChromaDB stores everything in a local folder (data/index/).
 No server to start, no cloud account needed. Just files on disk.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 import chromadb

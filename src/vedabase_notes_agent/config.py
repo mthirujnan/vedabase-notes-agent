@@ -11,6 +11,8 @@ Beginner tip:
   If the key is missing it returns the default value.
 """
 
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from dotenv import load_dotenv

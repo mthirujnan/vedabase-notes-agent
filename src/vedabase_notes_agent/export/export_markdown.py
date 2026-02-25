@@ -9,6 +9,8 @@ Markdown is a simple text format that renders nicely in:
   - Your browser with a markdown viewer extension
 """
 
+from __future__ import annotations
+
 import re
 from datetime import datetime
 from pathlib import Path

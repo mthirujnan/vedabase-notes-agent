@@ -20,6 +20,8 @@ Beginner tip — what is a "wrapper"?
   how the TV works internally.
 """
 
+from __future__ import annotations
+
 import importlib.util
 import json
 import shutil
