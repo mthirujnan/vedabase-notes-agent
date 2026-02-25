@@ -95,3 +95,7 @@ else:
 from vedabase_notes_agent.config import CLAUDE_API_KEY
 if not CLAUDE_API_KEY:
     st.sidebar.error("🔑 CLAUDE_API_KEY missing in .env")
+
+# ── Background jobs sidebar ─────────────────────────────────────────────────
+from vedabase_notes_agent.ui_jobs import show_jobs_sidebar
+show_jobs_sidebar()

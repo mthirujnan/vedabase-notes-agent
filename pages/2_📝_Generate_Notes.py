@@ -1,49 +1,43 @@
 """
-Generate Notes page — the main feature of the app.
+Generate Notes page — async version.
 
-Fill in a topic, audience, duration and style, hit Generate,
-and the agent produces a full set of cited study notes.
+Clicking Generate starts a background job and immediately returns
+control to the user. They can navigate away freely.
+The sidebar on every page shows live job status.
 """
+
+from __future__ import annotations
 
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import streamlit as st
-from vedabase_notes_agent.config import CLAUDE_API_KEY, CHUNKS_DIR
+from vedabase_notes_agent.config import CLAUDE_API_KEY
 
 st.set_page_config(page_title="Generate Notes — Vedabase", page_icon="📝", layout="wide")
 st.title("📝 Generate Notes")
 st.markdown(
-    "Describe your topic below. The agent will retrieve relevant passages "
-    "from the Nectar of Instruction and write structured notes with citations."
+    "Describe your topic and hit **Generate**. "
+    "Notes build in the background — you can browse other pages while you wait. "
+    "Watch the sidebar for completion."
 )
 st.divider()
 
-# ── Guard: check pipeline is ready ───────────────────────────────────────────
+# ── Guard: pipeline ready? ────────────────────────────────────────────────────
 
 try:
     from vedabase_notes_agent.index.vector_store import collection_size
-    db_size = collection_size()
-    pipeline_ready = db_size > 0
+    pipeline_ready = collection_size() > 0
 except Exception:
     pipeline_ready = False
-    db_size = 0
 
 if not pipeline_ready:
-    st.warning(
-        "The vector database is empty. "
-        "Please complete the **⚙️ Pipeline** steps first.",
-        icon="⚠️",
-    )
+    st.warning("The vector database is empty. Complete the **⚙️ Pipeline** steps first.", icon="⚠️")
     st.stop()
 
 if not CLAUDE_API_KEY:
-    st.error(
-        "CLAUDE_API_KEY is not set. Add it to your `.env` file.\n\n"
-        "Get a key at: https://console.anthropic.com",
-        icon="🔑",
-    )
+    st.error("CLAUDE_API_KEY is not set. Add it to your `.env` file.", icon="🔑")
     st.stop()
 
 # ── Input form ────────────────────────────────────────────────────────────────
@@ -54,129 +48,107 @@ with st.form("notes_form"):
     topic = st.text_input(
         "Topic *",
         placeholder="e.g. controlling the six urges, qualities of a Vaishnava, Vrindavana...",
-        help="Be specific. The agent will search for the most relevant passages.",
     )
 
     col1, col2, col3 = st.columns(3)
-
     with col1:
-        audience = st.text_input(
-            "Audience",
-            value="general devotees",
-            help="Who is this for? e.g. new students, experienced practitioners",
-        )
-
+        audience = st.text_input("Audience", value="general devotees")
     with col2:
-        duration = st.slider(
-            "Duration (minutes)",
-            min_value=15,
-            max_value=120,
-            value=60,
-            step=15,
-            help="How long is the class or discourse?",
-        )
-
+        duration = st.slider("Duration (minutes)", 15, 120, 60, step=15)
     with col3:
-        style = st.radio(
-            "Style",
-            options=["class", "discourse"],
-            help="Class = structured lecture with clear sections. Discourse = flowing presentation.",
-        )
+        style = st.radio("Style", ["class", "discourse"])
 
     submitted = st.form_submit_button(
-        "✨ Generate Notes",
+        "✨ Generate in Background",
         type="primary",
         use_container_width=True,
     )
 
-# ── Generation ────────────────────────────────────────────────────────────────
+# ── On submit: start background job ──────────────────────────────────────────
 
 if submitted:
     if not topic.strip():
         st.error("Please enter a topic.")
-        st.stop()
+    else:
+        from vedabase_notes_agent.jobs import start_job
+        job_id = start_job(topic.strip(), audience, duration, style)
 
-    # Store inputs in session so the result page can show them
-    st.session_state["last_topic"]    = topic
-    st.session_state["last_audience"] = audience
-    st.session_state["last_duration"] = duration
-    st.session_state["last_style"]    = style
-
-    with st.status("🤖 Agent is working...", expanded=True) as status:
-        try:
-            st.write(f"**Topic:** {topic}")
-            st.write("Step 1/4 — Retrieving relevant passages from vector DB...")
-
-            from vedabase_notes_agent.retrieve.retriever import retrieve, format_context
-            hits = retrieve(topic)
-            st.write(f"Found **{len(hits)} passages** from: "
-                     + ", ".join(sorted({f"NOI {h['verse_number']}" for h in hits})))
-
-            st.write("Step 2/4 — Planning outline with Claude...")
-            st.write("Step 3/4 — Drafting full notes with citations...")
-            st.write("Step 4/4 — Verifying citations and sections...")
-
-            from vedabase_notes_agent.agent.notes_agent import generate_notes
-            notes = generate_notes(topic, audience, duration, style)
-
-            from vedabase_notes_agent.export.export_markdown import export_notes
-            saved_path = export_notes(notes, topic)
-
-            st.session_state["generated_notes"] = notes
-            st.session_state["saved_path"]       = str(saved_path)
-
-            status.update(label="✅ Notes ready!", state="complete")
-
-        except Exception as e:
-            status.update(label="Generation failed", state="error")
-            st.error(f"Error: {e}")
-            st.stop()
-
-# ── Display results ───────────────────────────────────────────────────────────
-
-if "generated_notes" in st.session_state:
-    notes      = st.session_state["generated_notes"]
-    saved_path = st.session_state.get("saved_path", "")
-
-    st.divider()
-
-    # Action bar above the notes
-    col_title, col_dl, col_clear = st.columns([4, 1, 1])
-    with col_title:
-        topic_label = st.session_state.get("last_topic", "Notes")
-        st.subheader(f"📄 {topic_label}")
-    with col_dl:
-        st.download_button(
-            "⬇ Download",
-            data=notes,
-            file_name=Path(saved_path).name if saved_path else "notes.md",
-            mime="text/markdown",
-            use_container_width=True,
+        st.success(
+            f"**Generating in the background!**  Job ID: `{job_id}`\n\n"
+            "You can navigate to any page — the sidebar will show when notes are ready.",
+            icon="🚀",
         )
-    with col_clear:
-        if st.button("✕ Clear", use_container_width=True):
-            del st.session_state["generated_notes"]
-            st.rerun()
+        st.info(
+            "**What the agent is doing:**\n"
+            "1. Retrieving relevant NOI passages from vector DB\n"
+            "2. Planning an outline with Claude\n"
+            "3. Drafting notes with NOI citations, stories & supplemental Prabhupada references\n"
+            "4. Verifying all citations and sections\n"
+            "5. Saving to `data/outputs/`",
+            icon="🤖",
+        )
 
-    if saved_path:
-        st.caption(f"Saved to: `{saved_path}`")
+# ── Recent jobs on this page ──────────────────────────────────────────────────
 
-    # Render the notes as markdown in a scrollable container
-    with st.container(border=True):
-        st.markdown(notes)
+st.divider()
+st.subheader("Recent Jobs")
 
-# ── Sidebar: retrieved passages ───────────────────────────────────────────────
+from vedabase_notes_agent.jobs import get_all_jobs, clear_job
 
-if "generated_notes" in st.session_state:
-    with st.sidebar:
-        st.markdown("### 📑 Verses Used")
-        topic_label = st.session_state.get("last_topic", "")
-        if topic_label:
-            try:
-                from vedabase_notes_agent.retrieve.retriever import retrieve
-                hits = retrieve(topic_label)
-                verses_used = sorted({f"NOI {h['verse_number'].capitalize()}" for h in hits})
-                for v in verses_used:
-                    st.markdown(f"- {v}")
-            except Exception:
-                pass
+jobs = get_all_jobs()
+if not jobs:
+    st.caption("No jobs yet. Generate your first notes above!")
+else:
+    for job in jobs[:10]:
+        status     = job["status"]
+        topic_text = job.get("topic", "")
+        job_id     = job["job_id"]
+        icon = {"running": "⏳", "done": "✅", "error": "❌"}.get(status, "❓")
+
+        with st.container(border=True):
+            col_info, col_action = st.columns([5, 1])
+
+            with col_info:
+                st.markdown(f"{icon} **{topic_text}**")
+                st.caption(
+                    f"Style: {job.get('style')} · "
+                    f"Audience: {job.get('audience')} · "
+                    f"Duration: {job.get('duration')} min · "
+                    f"ID: `{job_id}`"
+                )
+
+                if status == "running":
+                    st.progress(0.0, text="Generating... (20-60 seconds)")
+
+                elif status == "done":
+                    result_path = job.get("result_path", "")
+                    st.caption(f"Saved: `{result_path}`")
+                    if result_path and Path(result_path).exists():
+                        with st.expander("Preview notes"):
+                            st.markdown(Path(result_path).read_text(encoding="utf-8"))
+
+                elif status == "error":
+                    st.error(job.get("error", "Unknown error"))
+
+            with col_action:
+                st.write("")
+                if status != "running":
+                    if st.button("✕ Clear", key=f"clear_{job_id}", use_container_width=True):
+                        clear_job(job_id)
+                        st.rerun()
+                if status == "done":
+                    result_path = job.get("result_path", "")
+                    if result_path and Path(result_path).exists():
+                        st.download_button(
+                            "⬇ Download",
+                            data=Path(result_path).read_text(encoding="utf-8"),
+                            file_name=Path(result_path).name,
+                            mime="text/markdown",
+                            key=f"dl_{job_id}",
+                            use_container_width=True,
+                        )
+
+# ── Sidebar jobs widget ───────────────────────────────────────────────────────
+
+from vedabase_notes_agent.ui_jobs import show_jobs_sidebar
+show_jobs_sidebar()

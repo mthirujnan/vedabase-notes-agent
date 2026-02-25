@@ -200,3 +200,7 @@ with st.sidebar:
         if st.button(q, key=f"quick_{q}", use_container_width=True):
             st.query_params["q"] = q
             st.rerun()
+
+# ── Background jobs sidebar ─────────────────────────────────────────────────
+from vedabase_notes_agent.ui_jobs import show_jobs_sidebar
+show_jobs_sidebar()
