@@ -1,0 +1,15 @@
+# ── Core agent / LLM ─────────────────────────────────────────────────────────
+anthropic>=0.25.0          # Claude API client
+
+# ── Vector database (local, no server needed) ────────────────────────────────
+chromadb>=0.5.0            # Local vector DB — stores and searches embeddings
+
+# ── Embeddings (runs 100% locally, no API needed) ────────────────────────────
+sentence-transformers>=3.0.0   # Converts text → numbers (vectors)
+
+# ── CLI & terminal output ────────────────────────────────────────────────────
+click>=8.1.0               # Builds the command-line interface
+rich>=13.7.0               # Pretty colored terminal output
+
+# ── Config / env ────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0       # Reads .env file into os.environ

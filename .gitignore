@@ -1,0 +1,26 @@
+# Environment & secrets
+.env
+
+# Data directories — generated locally, not committed
+data/raw/
+data/clean/
+data/chunks/
+data/index/
+data/outputs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Mac
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
