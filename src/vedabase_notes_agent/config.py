@@ -52,5 +52,5 @@ NOI_SCRAPER_PATH: Path | None = (
 TOP_K: int = 8
 
 # ── Agent settings ────────────────────────────────────────────────────────────
-MAX_TOKENS: int = 4096   # max tokens Claude can return per call
+MAX_TOKENS: int = 8192   # max tokens Claude can return per call
 EXCERPT_MAX_CHARS: int = 300  # max length of quoted excerpts in notes

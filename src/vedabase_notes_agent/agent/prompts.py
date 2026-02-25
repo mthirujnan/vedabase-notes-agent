@@ -75,7 +75,11 @@ Retrieved NOI passages (these are your PRIMARY source — cite everything from h
 You may ALSO use your knowledge of other Śrīla Prabhupāda books
 (BG, SB, CC, NOD, etc.) to add SUPPLEMENTAL supporting references.
 
-Follow this exact template:
+CRITICAL: You MUST complete EVERY section below. Keep each section concise so you
+do not run out of space. Do NOT write lengthy paragraphs — use tight, punchy points.
+Complete all sections even if brief. An incomplete document is useless.
+
+Output the following template exactly, filling in every section:
 
 ---
 # {topic}
@@ -89,51 +93,52 @@ Follow this exact template:
 
 ## Detailed Notes
 
-[For each section in the outline, write 3-5 key points.
- Each key point MUST end with a citation.
- Primary: [NOI 3 Purport] — Supplemental: [BG 6.5 Purport] or [SB 11.2.45]]
+[For EACH section in the outline write 2-3 key points (not more).
+ Each point is 1-2 sentences MAX, ending with its citation.
+ Primary: [NOI 3 Purport]  Supplemental: [BG 6.5 Purport] or [SB 11.2.45 Purport]]
 
 ## Stories & Pastimes
 
 ### Story 1: [Title]
-[Tell the story in 100-150 words. Make it vivid and connected to the topic.
- End with: *Lesson: ...* and cite the source e.g. [SB 9.4.18–20] or [CC Antya 6]]
+[80-120 words. Vivid, connected to topic. End: *Lesson: ...* [Source citation]]
 
 ### Story 2: [Title]
-[Second story — can be a direct pastime of Kṛṣṇa, a devotee's example,
- or an anecdote Śrīla Prabhupāda used in his lectures.
- End with: *Lesson: ...* and source citation]
+[80-120 words. Devotee example or Prabhupāda anecdote. End: *Lesson: ...* [Source]]
 
-### Story 3: [Title — only if strongly relevant to topic]
-[Optional third story. Omit this section if a third story would feel forced.]
+### Story 3: [Title]
+[80-120 words. Only if genuinely relevant — otherwise write "N/A — two stories sufficient."]
 
 ## Supplemental References from Śrīla Prabhupāda's Other Books
-[List 3-5 relevant quotes or teachings from BG, SB, CC, NOD, etc.
- that deepen the topic. Format each as:
- **[Book Citation]** "Quote or teaching in one sentence." ]
+
+**[Citation 1]** "One-sentence quote or teaching."
+**[Citation 2]** "One-sentence quote or teaching."
+**[Citation 3]** "One-sentence quote or teaching."
+**[Citation 4]** "One-sentence quote or teaching." *(optional)*
+**[Citation 5]** "One-sentence quote or teaching." *(optional)*
 
 ## Practical Applications
-1. [Application with citation — how to apply this teaching today]
-2. [Application with citation]
-3. [Application with citation]
+1. [One sentence + citation]
+2. [One sentence + citation]
+3. [One sentence + citation]
 
 ## Discussion Prompts
-1. [Question that draws out the verse's meaning]
-2. [Question connecting the teaching to daily life]
-3. [Question on how to practically apply this]
+1. [Question drawing out the verse's meaning]
+2. [Question connecting teaching to daily life]
+3. [Question on practical application]
 4. [Deeper philosophical question]
-5. [Question for self-reflection]
+5. [Self-reflection question]
 
 ## Appendix: Key NOI Passages
-[Include 3-5 short direct quotes from the retrieved NOI passages.
- Each quote must be ≤ {excerpt_max} characters and end with its citation.
- Format: > "quote text" — [NOI X Section]]
+> "[Quote ≤ {excerpt_max} chars]" — [NOI X Section]
+> "[Quote ≤ {excerpt_max} chars]" — [NOI X Section]
+> "[Quote ≤ {excerpt_max} chars]" — [NOI X Section]
 ---
 
-Important:
-- Every key point MUST contain a citation (NOI or other book)
-- Stories must feel natural and directly connected to the topic
-- Do not invent quotes — if unsure of exact wording, paraphrase and note it
+Rules:
+- Every key point MUST have a citation
+- Stories end with *Lesson: ...* and a source
+- Do not invent exact quotes — paraphrase and note it
+- FINISH every section — an unfinished document fails verification
 """
 
 
