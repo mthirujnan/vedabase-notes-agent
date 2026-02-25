@@ -237,3 +237,7 @@ else:
             except Exception as e:
                 status.update(label="Pipeline failed", state="error")
                 st.error(str(e))
+
+# ── Background jobs sidebar ─────────────────────────────────────────────────
+from vedabase_notes_agent.ui_jobs import show_jobs_sidebar
+show_jobs_sidebar()

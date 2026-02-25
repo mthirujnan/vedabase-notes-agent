@@ -12,21 +12,29 @@ the AI — what instructions we give Claude at each step.
 # ── System prompt ─────────────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """\
-You are a faithful teaching assistant specialising in the Nectar of Instruction
-(Śrī Upadeśāmṛta) by Śrīla Rūpa Gosvāmī with commentary by Śrīla Prabhupāda.
+You are a faithful teaching assistant specialising in Śrīla Prabhupāda's books,
+especially the Nectar of Instruction (Śrī Upadeśāmṛta) by Śrīla Rūpa Gosvāmī.
 
 Your role:
-- Help prepare study notes and class outlines
-- Ground every statement in the provided source passages
-- Cite every key point with the format [NOI <verse> <section>]
-  e.g. [NOI 1 Translation], [NOI 3 Purport], [NOI Preface]
-- Never add information not found in the provided context
-- If the context is insufficient for a point, say so explicitly
+- Help prepare study notes, class outlines, and discourse guides
+- Primary citations come from the retrieved NOI passages provided to you
+- You may ALSO draw on your knowledge of other Śrīla Prabhupāda books to
+  supplement — Bhagavad-gītā As It Is (BG), Śrīmad-Bhāgavatam (SB),
+  Caitanya-caritāmṛta (CC), Nectar of Devotion (NOD), etc.
+- Include 2-3 illustrative stories or Vedic pastimes that strengthen the teaching
+- Cite every statement clearly
 
 Citation format rules:
-  [NOI 1 Translation]   — for a verse's translation
-  [NOI 3 Purport]       — for the commentary
-  [NOI Preface]         — for the preface
+  Primary (from retrieved text):
+    [NOI 1 Translation], [NOI 3 Purport], [NOI Preface]
+
+  Supplemental (from your knowledge of other books):
+    [BG 6.5 Purport], [SB 11.2.45 Purport], [CC Madhya 22.54],
+    [NOD Ch.8], [BG 3.42 Translation] — use chapter/verse where known
+
+  Stories:
+    Attribute clearly: "In the pastime of..." or "Śrīla Prabhupāda tells..."
+    End with source if known: [SB 9.4.18–20], [CC Antya 6], etc.
 """
 
 
@@ -43,7 +51,8 @@ Retrieved passages:
 {context}
 
 Produce a numbered outline with 3-6 main sections and estimated time per section.
-Each section must be supported by at least one citation from the passages above.
+Include one section for stories/pastimes and one for practical application.
+Each section should note which source (NOI verse or other book) will support it.
 Format: plain text outline only — no notes yet.
 """
 
@@ -51,7 +60,7 @@ Format: plain text outline only — no notes yet.
 # ── Step (b): Draft the full notes ───────────────────────────────────────────
 
 DRAFT_PROMPT = """\
-Using the outline below and the retrieved passages, write complete study notes
+Using the outline and retrieved passages, write complete study notes
 for a {style} on: "{topic}"
 
 Audience: {audience}
@@ -60,8 +69,11 @@ Duration: {duration} minutes
 Outline:
 {outline}
 
-Retrieved passages (use these as your only source — cite everything):
+Retrieved NOI passages (these are your PRIMARY source — cite everything from here):
 {context}
+
+You may ALSO use your knowledge of other Śrīla Prabhupāda books
+(BG, SB, CC, NOD, etc.) to add SUPPLEMENTAL supporting references.
 
 Follow this exact template:
 
@@ -78,12 +90,32 @@ Follow this exact template:
 ## Detailed Notes
 
 [For each section in the outline, write 3-5 key points.
- Each key point MUST end with a citation like [NOI 3 Purport].]
+ Each key point MUST end with a citation.
+ Primary: [NOI 3 Purport] — Supplemental: [BG 6.5 Purport] or [SB 11.2.45]]
+
+## Stories & Pastimes
+
+### Story 1: [Title]
+[Tell the story in 100-150 words. Make it vivid and connected to the topic.
+ End with: *Lesson: ...* and cite the source e.g. [SB 9.4.18–20] or [CC Antya 6]]
+
+### Story 2: [Title]
+[Second story — can be a direct pastime of Kṛṣṇa, a devotee's example,
+ or an anecdote Śrīla Prabhupāda used in his lectures.
+ End with: *Lesson: ...* and source citation]
+
+### Story 3: [Title — only if strongly relevant to topic]
+[Optional third story. Omit this section if a third story would feel forced.]
+
+## Supplemental References from Śrīla Prabhupāda's Other Books
+[List 3-5 relevant quotes or teachings from BG, SB, CC, NOD, etc.
+ that deepen the topic. Format each as:
+ **[Book Citation]** "Quote or teaching in one sentence." ]
 
 ## Practical Applications
-1. [First application with citation]
-2. [Second application with citation]
-3. [Third application with citation]
+1. [Application with citation — how to apply this teaching today]
+2. [Application with citation]
+3. [Application with citation]
 
 ## Discussion Prompts
 1. [Question that draws out the verse's meaning]
@@ -92,35 +124,41 @@ Follow this exact template:
 4. [Deeper philosophical question]
 5. [Question for self-reflection]
 
-## Appendix: Key Passages
-[Include 3-5 short direct quotes from the retrieved passages.
+## Appendix: Key NOI Passages
+[Include 3-5 short direct quotes from the retrieved NOI passages.
  Each quote must be ≤ {excerpt_max} characters and end with its citation.
  Format: > "quote text" — [NOI X Section]]
 ---
 
-Important: every key point and application MUST contain a citation.
-Do not invent information. If the passages don't support a point, omit it.
+Important:
+- Every key point MUST contain a citation (NOI or other book)
+- Stories must feel natural and directly connected to the topic
+- Do not invent quotes — if unsure of exact wording, paraphrase and note it
 """
 
 
 # ── Step (c): Verification prompt ────────────────────────────────────────────
 
 VERIFY_PROMPT = """\
-Review the following study notes for the Nectar of Instruction.
-Check each requirement and respond with a JSON object only (no other text):
+Review the following study notes. Check each requirement and respond
+with a JSON object only (no other text):
 
 Requirements to check:
-1. Every key point has a citation in format [NOI X Section]
-2. The notes contain all required sections:
-   - Outline, Detailed Notes, Practical Applications,
-     Discussion Prompts, Appendix: Key Passages
-3. No excerpt in the Appendix exceeds {excerpt_max} characters
-4. No claims are made without citation support
+1. Every key point has a citation [NOI X Section] or [Book X.X]
+2. All required sections are present:
+   Outline, Detailed Notes, Stories & Pastimes,
+   Supplemental References, Practical Applications,
+   Discussion Prompts, Appendix
+3. At least 2 stories are included
+4. At least 3 supplemental references from other books
+5. No excerpt in the Appendix exceeds {excerpt_max} characters
 
 Respond with this exact JSON:
 {{
   "all_points_cited": true/false,
   "required_sections_present": true/false,
+  "stories_included": true/false,
+  "supplemental_refs_included": true/false,
   "excerpts_within_limit": true/false,
   "issues": ["list any problems found, or empty list if none"],
   "pass": true/false

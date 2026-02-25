@@ -100,3 +100,7 @@ with col_content:
         else:
             st.warning("File no longer exists.")
             del st.session_state["viewing_note"]
+
+# ── Background jobs sidebar ─────────────────────────────────────────────────
+from vedabase_notes_agent.ui_jobs import show_jobs_sidebar
+show_jobs_sidebar()

@@ -32,6 +32,8 @@ from vedabase_notes_agent.agent.prompts import VERIFY_PROMPT, SYSTEM_PROMPT
 REQUIRED_SECTIONS = [
     "## Outline",
     "## Detailed Notes",
+    "## Stories",
+    "## Supplemental References",
     "## Practical Applications",
     "## Discussion Prompts",
     "## Appendix",
