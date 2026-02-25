@@ -13,3 +13,6 @@ rich>=13.7.0               # Pretty colored terminal output
 
 # ── Config / env ────────────────────────────────────────────────────────────
 python-dotenv>=1.0.0       # Reads .env file into os.environ
+
+# ── Web UI ───────────────────────────────────────────────────────────────────
+streamlit>=1.35.0          # Local web UI — run with: streamlit run app.py

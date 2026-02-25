@@ -1,0 +1,10 @@
+[theme]
+# Dark gold theme matching the noi-search app
+primaryColor        = "#f0c040"
+backgroundColor     = "#0d1117"
+secondaryBackgroundColor = "#161b22"
+textColor           = "#e6edf3"
+font                = "serif"
+
+[browser]
+gatherUsageStats = false
