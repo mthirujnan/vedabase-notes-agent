@@ -195,6 +195,25 @@ def smoke_test_cmd():
     raise SystemExit(0 if passed else 1)
 
 
+# ── ui ───────────────────────────────────────────────────────────────────────
+
+@cli.command("ui")
+def ui_cmd():
+    """
+    Launch the Streamlit web UI in your browser.
+
+    Shortcut for: streamlit run app.py
+    """
+    import subprocess
+    app_path = Path(__file__).parent.parent.parent.parent / "app.py"
+    if not app_path.exists():
+        console.print(f"[red]Cannot find app.py at {app_path}[/]")
+        raise SystemExit(1)
+    console.print(f"[green]Launching UI →[/] {app_path}")
+    console.print("[dim]Opening in browser... Press Ctrl+C to stop.[/]")
+    subprocess.run(["streamlit", "run", str(app_path)])
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
